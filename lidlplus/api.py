@@ -209,21 +209,16 @@ class LidlPlusApi:
             browser.find_element(By.NAME, "VerificationCode").send_keys(verify_code)
             self._click(browser, (By.CLASS_NAME, "role_next"))
 
-    def login(self, phone, password, **kwargs):
+    def login(self, email, password, **kwargs):
         """Simulate app auth"""
         browser = self._get_browser(headless=kwargs.get("headless", True))
         browser.get(self._register_link)
         wait = WebDriverWait(browser, 10)
-        wait.until(expected_conditions.visibility_of_element_located((By.ID, "button_welcome_login"))).click()
-        wait.until(expected_conditions.visibility_of_element_located((By.NAME, "EmailOrPhone"))).send_keys(phone)
-        self._click(browser, (By.ID, "button_btn_submit_email"))
-        self._click(
-            browser,
-            (By.ID, "button_btn_submit_email"),
-            request=f"{self._AUTH_API}/api/phone/exists.*",
-        )
-        wait.until(expected_conditions.element_to_be_clickable((By.ID, "field_Password"))).send_keys(password)
-        self._click(browser, (By.ID, "button_submit"))
+        wait.until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="duple-button-block"]/button[1]/span'))).click()
+        #wait.until(expected_conditions.visibility_of_element_located((By.NAME, "EmailOrPhone"))).send_keys(phone)
+        wait.until(expected_conditions.element_to_be_clickable((By.NAME, "input-email"))).send_keys(email)
+        wait.until(expected_conditions.element_to_be_clickable((By.NAME, "Password"))).send_keys(password)
+        self._click(browser, (By.XPATH, '//*[@id="duple-button-block"]/button'))
         self._check_login_error(browser)
         self._check_2fa_auth(
             browser,
